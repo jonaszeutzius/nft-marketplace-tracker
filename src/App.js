@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import axios from 'axios';
+import WalletInput from './WalletInput';
+import CollectionsList from './CollectionsList';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const App = () => {
+    const [collections, setCollections] = React.useState([]);
+
+    const fetchCollections = async (address) => {
+      try {
+          const options = {
+              method: 'GET',
+              url: `${process.env.REACT_APP_API_BASE_URL}/${address}`,
+              headers: {
+                  accept: 'application/json',
+                  'X-API-KEY': process.env.REACT_APP_API_KEY
+              }
+          };
+         
+          const response = await axios.request(options);
+          setCollections(response.data.collections);
+      } catch (error) {
+          console.error('Error fetching collections:', error);
+      }
+  };
+ 
+
+    return (
+        <div className="App">
+            <WalletInput onSearch={fetchCollections} />
+            <CollectionsList collections={collections} />
+        </div>
+    );
+};
 
 export default App;
+
