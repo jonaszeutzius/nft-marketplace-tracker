@@ -1,70 +1,345 @@
-# Getting Started with Create React App
+# NFT PRICE DASHBOARD
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Blockspan API offers a wealth of data about NFTs. It's a treasure trove for developers who want to build applications around NFTs, whether it's for pricing, trading, analytics, or anything else you can imagine in the NFT space.
 
-## Available Scripts
+In this guide, we will create an application that finds all NFTs owned by a particular wallet accross all blockchains. The user will input only the wallet address, and see a table of all NFTs and their chain. This application will use the Blockspan Get All NFTs Of Owner API. 
 
-In the project directory, you can run:
+## REQUIREMENTS:
+- Node.js and npm installed on your system.
+- Basic knowledge of React.js
+- Blockspan API key
 
-### `npm start`
+## STEP 1: SETTING UP THE REACT APP
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+First, we need to create a new React application. Open your terminal, navigate to the directory where you want to create your project, and run the following command:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+`npx create-react-app nft-marketplace-tracker`
 
-### `npm test`
+This will create a new folder `nft-marketplace-tracker` with all the necessary files and dependencies for a React application.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## STEP 2: INSTALL AXIOS
 
-### `npm run build`
+We'll be using Axios to make HTTP requests to the Blockspan API. Navigate into your new project folder and install Axios:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+`cd nft-marketplace-tracker` 
+`npm install axios`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## STEP 3: WRITING THE COMPONENT
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+In `App.js`, we will import React, Axios, and App.css. Then we will set up necessary state variables such as contractAddress and blockchain. Replace everything in `App.js` with the following:
 
-### `npm run eject`
+```
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './App.css';
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+const App = () => {
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [NFTs, setNFTs] = useState([]);
+  const [chainArray, setChainArray] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(true)
+  const [hasClicked, setHasClicked] = useState(false)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  const blockchains = ['eth-main', 'arbitrum-main', 'optimism-main', 'poly-main', 'bsc-main', 'eth-goerli'];
+  const [ethNFTs, setEthNFTs] = useState(null);
+  const [arbitrumNFTs, setArbitrumNFTs] = useState(null);
+  const [optimismNFTs, setOptimismNFTs] = useState(null);
+  const [polyNFTs, setPolyNFTs] = useState(null);
+  const [bscNFTs, setBscNFTs] = useState(null);
+  const [goerliNFTs, setGoerliNFTs] = useState(null);
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+  // fetchNFTs function
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  // useEffect function
 
-## Learn More
+  return (
+    // JSX code
+  );
+}
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+export default App;
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## STEP 4: FETCHING AND DISPLAYING THE DATA
 
-### Code Splitting
+We will add a function `fetchNFTs` to our component that makes a get request to the Blockspan API and sets `priceSummary` in our state:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```
+// fetchNFTs function
 
-### Analyzing the Bundle Size
+const fetchNFTs = async () => {
+    setEthNFTs(null);
+    setArbitrumNFTs(null);
+    setOptimismNFTs(null);
+    setPolyNFTs(null);
+    setBscNFTs(null);
+    setGoerliNFTs(null);
+    setIsLoading(true); 
+    setError(true)
+    setHasClicked(true)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+    for (const index in blockchains) {
+      const blockchain = blockchains[index];
+      try {
+        const options = {
+          method: 'GET',
+          url: `http://localhost:8080/v1/nfts/owner/${walletAddress}?chain=${blockchain}&include_nft_details=true&page_size=25`,
+          headers: {
+            accept: 'application/json',
+            'X-API-KEY': 'YOUR_BLOCKSPAN_API_KEY',
+          },
+        };
+        const response = await axios.request(options);
+        switch (blockchain) {
+          case 'eth-main':
+            setEthNFTs(response.data.results);
+            break;
+          case 'arbitrum-main':
+            setArbitrumNFTs(response.data.results);
+            break;
+          case 'optimism-main':
+            setOptimismNFTs(response.data.results);
+            break;
+          case 'poly-main':
+            setPolyNFTs(response.data.results);
+            break;
+          case 'bsc-main':
+            setBscNFTs(response.data.results);
+            break;
+          case 'eth-goerli':
+            setGoerliNFTs(response.data.results);
+            break;
+          default:
+            break;
+        }
+        setError(false)
+      } catch (error) {
+        // console.error('Error fetching collections:', error);
+      }
+    }
 
-### Making a Progressive Web App
+    setIsLoading(false);
+  };
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Don't forget to replace `YOUR_BLOCKSPAN_API_KEY` with your actual key!
 
-### Advanced Configuration
+We will then add a use effect function to combine data from all the chains into one single array
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```
+// useEffect function
 
-### Deployment
+useEffect(() => {
+    let updatedNFTs = [];
+    let updatedChainArray = [];
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+    if (ethNFTs !== null) {
+      updatedNFTs = updatedNFTs.concat(ethNFTs);
+      updatedChainArray = updatedChainArray.concat(Array(ethNFTs.length).fill('eth-main'));
+    }
+    if (arbitrumNFTs !== null) {
+      updatedNFTs = updatedNFTs.concat(arbitrumNFTs);
+      updatedChainArray = updatedChainArray.concat(Array(arbitrumNFTs.length).fill('arbitrum-main'));
+    }
+    if (optimismNFTs !== null) {
+      updatedNFTs = updatedNFTs.concat(optimismNFTs);
+      updatedChainArray = updatedChainArray.concat(Array(optimismNFTs.length).fill('optimism-main'));
+    }
+    if (polyNFTs !== null) {
+      updatedNFTs = updatedNFTs.concat(polyNFTs);
+      updatedChainArray = updatedChainArray.concat(Array(polyNFTs.length).fill('poly-main'));
+    }
+    if (bscNFTs !== null) {
+      updatedNFTs = updatedNFTs.concat(bscNFTs);
+      updatedChainArray = updatedChainArray.concat(Array(bscNFTs.length).fill('bsc-main'));
+    }
+    if (goerliNFTs !== null) {
+      updatedNFTs = updatedNFTs.concat(goerliNFTs);
+      updatedChainArray = updatedChainArray.concat(Array(goerliNFTs.length).fill('goerli-main'));
+    }
 
-### `npm run build` fails to minify
+    setNFTs(updatedNFTs);
+    setChainArray(updatedChainArray);
+  }, [ethNFTs, arbitrumNFTs, optimismNFTs, polyNFTs, bscNFTs, goerliNFTs]);
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Our JSX code will display a form for the user to input a wallet address, and a button to view NFTs. After the data is fetched, it will be displayed in a table:
+
+```
+  return (
+    // JSX code
+
+    <div className="App">
+      <h1 className="title">NFT Marketplace Tracker</h1>
+      <p>Input wallet address below to see NFT assets.</p>
+      <div className="inputContainer">
+        <input
+          type="text"
+          placeholder="Wallet Address"
+          value={walletAddress}
+          onChange={(e) => setWalletAddress(e.target.value)}
+        />
+        <button onClick={fetchNFTs}>View NFTs</button>
+      </div>
+      {isLoading ? ( 
+        <p className="loadingMessage">Loading NFTs...</p>
+      ) : error && hasClicked ? (
+        <p className="errorMessage">No NFTs owned by this wallet!</p>
+      ) : NFTs.length !== 0 && (
+        <table>
+          <thead>
+            <tr style={{ backgroundColor: '#f2f2f2' }}>
+              <th>NFT Number</th>
+              <th>Chain</th>
+              <th>Image</th>
+            </tr>
+          </thead>
+          <tbody>
+            {NFTs.map((nft, index) => (
+              <tr style={{ backgroundColor: '#f2f2f2' }} key={index}>
+                <td>{index + 1}</td>
+                <td>{chainArray[index]}</td>
+                <td>
+                  <div className="imageContainer">
+                    {nft.nft_details.cached_images && nft.nft_details.cached_images.medium_500_500 ? (
+                      <img className="image" src={nft.nft_details.cached_images.medium_500_500} alt={nft.nft_details.name} />
+                    ) : (
+                      <div className="message">Image not available.</div>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+```
+
+Finally, we will enhance the user interface in the browser by replacing all code in the App.css file with the following:
+
+```
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.title {
+  margin-top: 20px;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.errorMessage {
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
+
+.message {
+  text-align: center;
+}
+
+.image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.inputContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.inputContainer input {
+  padding: 10px;
+  font-size: 1em;
+  width: 200px;
+}
+
+.inputContainer button {
+  padding: 10px;
+  font-size: 1em;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.inputContainer button:hover {
+  background-color: #0056b3;
+}
+
+.imageContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%; 
+}
+
+.imageContainer img {
+  width: 100%; 
+  max-width: 150px;
+  height: auto; 
+}
+.nftData {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.nftData .image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nftData h2 {
+  margin: 10px 0;
+}
+
+.nftData p {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+td {
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  padding: 10px;
+  text-align: left;
+}
+
+.tableContainer {
+  display: flex;
+  justify-content: center;
+}
+```
+
+## STEP 5: RUNNING THE APPLICATION
+
+Now, you can start your application by running `npm start` in your terminal. You should see the following in the browser:
+
+- Text box for wallet address
+- A blue view NFTs button
+
+Input the wallet address you want to check, and click the view NFTs button. You should then see a table with multiple NFT images and what chain they belong to. 
+
+This wraps up our guide to creating an NFT Price Dashboard tool using the Blockspan API and React.js. Happy coding!
+
+## CONCLUSION
+
+Congratulations! You've just built a simple yet powerful NFT finder tool using the Blockspan API and React.js. As you've seen, the Blockspan API is intuitive to use and provides detailed and accurate information, making it a perfect choice for this kind of application. This tutorial is just a starting point - there are many ways you can expand and improve your tool. For example, you could add more error checking, improve the UI, or add support for more blockchains.
+
+As the world of NFTs continues to grow and evolve, tools like this will become increasingly important. Whether you're an NFT enthusiast, a developer, or a startup, understanding NFTs is a valuable skill. We hope you found this tutorial helpful.
