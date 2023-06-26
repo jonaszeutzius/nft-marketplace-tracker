@@ -84,7 +84,7 @@ const fetchNFTs = async () => {
       try {
         const options = {
           method: 'GET',
-          url: `http://localhost:8080/v1/nfts/owner/${walletAddress}?chain=${blockchain}&include_nft_details=true&page_size=25`,
+          url: `https://api.blockspan.com/v1/nfts/owner/${walletAddress}?chain=${blockchain}&include_nft_details=true&page_size=25`,
           headers: {
             accept: 'application/json',
             'X-API-KEY': 'YOUR_BLOCKSPAN_API_KEY',
@@ -115,7 +115,7 @@ const fetchNFTs = async () => {
         }
         setError(false)
       } catch (error) {
-        // console.error('Error fetching collections:', error);
+        console.error('Error fetching collections:', error);
       }
     }
 
@@ -340,6 +340,6 @@ This wraps up our guide to creating an NFT Price Dashboard tool using the Blocks
 
 ## CONCLUSION
 
-Congratulations! You've just built a simple yet powerful NFT finder tool using the Blockspan API and React.js. As you've seen, the Blockspan API is intuitive to use and provides detailed and accurate information, making it a perfect choice for this kind of application. This tutorial is just a starting point - there are many ways you can expand and improve your tool. For example, you could add more error checking, improve the UI, or add support for more blockchains.
+Congratulations! You've just built a simple yet powerful NFT finder tool using the Blockspan API and React.js. As you've seen, the Blockspan API is intuitive to use and provides detailed and accurate information, making it a perfect choice for this kind of application. This tutorial is just a starting point - there are many ways you can expand and improve your tool. For example, you could add more error checking, improve the UI, or retrieve more NFT data.
 
 As the world of NFTs continues to grow and evolve, tools like this will become increasingly important. Whether you're an NFT enthusiast, a developer, or a startup, understanding NFTs is a valuable skill. We hope you found this tutorial helpful.
