@@ -34,10 +34,10 @@ const App = () => {
       try {
         const options = {
           method: 'GET',
-          url: `http://localhost:8080/v1/nfts/owner/${walletAddress}?chain=${blockchain}&include_nft_details=true&page_size=25`,
+          url: `https://api.blockspan.com/v1/nfts/owner/${walletAddress}?chain=${blockchain}&include_nft_details=true&page_size=25`,
           headers: {
             accept: 'application/json',
-            'X-API-KEY': '2jhzbqIWanB8puiqySBIWJVf6Ovp7oPW',
+            'X-API-KEY': 'YOUR_BLOCKSPAN_API_KEY',
           },
         };
         const response = await axios.request(options);
