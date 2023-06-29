@@ -1,4 +1,4 @@
-# NFT PRICE DASHBOARD
+# NFT MARKETPLACE TRACKER
 
 Blockspan API offers a wealth of data about NFTs. It's a treasure trove for developers who want to build applications around NFTs, whether it's for pricing, trading, analytics, or anything else you can imagine in the NFT space.
 
